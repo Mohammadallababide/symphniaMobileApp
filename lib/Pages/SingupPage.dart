@@ -110,7 +110,7 @@ class _SingUpPageState extends State<SingUpPage> {
               child: Text(
                 'إنشاء حساب',
                 style: TextStyle(
-                  fontFamily: ArabicFonts.Lateef,
+                  fontFamily: ArabicFonts.Harmattan,
                   package: 'google_fonts_arabic',
                   fontWeight: FontWeight.bold,
                   fontSize: 25,
@@ -164,7 +164,7 @@ class _SingUpPageState extends State<SingUpPage> {
         if (value.isEmpty ||
             !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
                 .hasMatch(value)) {
-          return 'Please enter a valid email';
+          return 'البريد الأكتروني غير صالح';
         }
       },
       onSaved: (String value) {
@@ -177,12 +177,12 @@ class _SingUpPageState extends State<SingUpPage> {
   Widget _buildPasswordTextField() {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: 'Password', filled: true, fillColor: Colors.white),
+          labelText: 'كلمة المرور', filled: true, fillColor: Colors.white),
       obscureText: true,
       controller: _passwordTextController,
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
-          return 'Password invalid';
+          return 'كلمة المرور غير صالحة';
         }
       },
       onSaved: (String value) {
@@ -194,21 +194,22 @@ class _SingUpPageState extends State<SingUpPage> {
   Widget _buildPasswordConfirmTextField() {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: 'Confirm Password', filled: true, fillColor: Colors.white),
+          labelText: 'تأكيد كلمة المرور', filled: true, fillColor: Colors.white),
       obscureText: true,
       validator: (String value) {
         if (_passwordTextController.text != value) {
-          return 'Passwords do not match.';
+          return 'كلمة المرور غير متطابقة';
         }
       },
     );
   }
 
   void _submitForm(){
-    if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
+    if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
+    Navigator.pushNamed(context, '/auth');
   }
 
   Widget singUpButton(BuildContext context) {
@@ -247,5 +248,4 @@ class _SingUpPageState extends State<SingUpPage> {
   }
 
 }
-
 
