@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:symphonia_mobile_app/Pages/IntroPage.dart';
-import 'package:symphonia_mobile_app/Pages/SingInPage.dart';
-
+import 'package:symphonia_mobile_app/Pages/SingIn.dart';
+import './Pages/Singup.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (BuildContext context) => IntroPage(),
         '/singin': (BuildContext context) => SingInPage(),
+        '/singup':(BuildContext context) => SingUpPage(),
       },
       onGenerateRoute: (RouteSettings settings) {},
       onUnknownRoute: (RouteSettings settings) {},

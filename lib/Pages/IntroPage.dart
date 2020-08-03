@@ -7,26 +7,32 @@ class IntroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: customPurpleColor,
-      body: ListView(
-        children: <Widget>[
-          drawArtCurve(),
-          secondPart(context),
-        ],
-      ),
+        backgroundColor: customPurpleColor,
+        body: ListView(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 0),
+              child: drawArtCurve(),
+            ),
+            Transform.translate(
+                offset: Offset(0, 0),
+                child: secondPart(context)
+            ),
+          ],
+        ),
     );
   }
 }
 
 Widget drawArtCurve() {
   return Container(
-    height: 300.0,
+    height: 270.0,
     color: customPurpleColor,
     child: Stack(
       children: <Widget>[
         Center(
           child: Transform.translate(
-            offset: Offset(10, -9),
+            offset: Offset(10, -23),
             child: SvgPicture.string(
               svg_curve,
               allowDrawingOutsideViewBox: true,
@@ -34,7 +40,7 @@ Widget drawArtCurve() {
           ),
         ),
         Transform.translate(
-          offset: Offset(0, 10),
+          offset: Offset(0,-2),
           child: Center(
             child: Text(
               app_name,
@@ -56,6 +62,7 @@ Widget drawArtCurve() {
 
 Widget secondPart(BuildContext context) {
   return Container(
+
     decoration: BoxDecoration(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(30.0),
@@ -95,13 +102,17 @@ Widget secondPart(BuildContext context) {
               singInButton(context),
               Padding(
                 padding: const EdgeInsets.only(top: 20),
-                child: singUpButton(),
+                child: singUpButton(context),
               ),
             ],
           ),
         ),
-      ],
+    SizedBox(
+          height: 20.0,
+  child: Container(color: Colors.white,),
     ),
+  ],
+  ),
   );
 }
 
@@ -154,9 +165,11 @@ Widget singInButton(BuildContext context) {
   );
 }
 
-Widget singUpButton() {
+Widget singUpButton(BuildContext context) {
   return GestureDetector(
-    onTap: () {},
+    onTap: () {
+      Navigator.pushNamed(context, '/singup');
+    },
     child: Container(
       width: 300.0,
       height: 55.0,
@@ -182,5 +195,6 @@ Widget singUpButton() {
         ),
       ),
     ),
+
   );
 }
