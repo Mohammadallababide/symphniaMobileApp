@@ -202,11 +202,11 @@ class _SingUpPageState extends State<SingUpPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('An Error Occurred!'),
+            title: Text('!خطاء ما قد حصل'),
             content: Text(successInformation['message']),
             actions: <Widget>[
               FlatButton(
-                child: Text('Okay'),
+                child: Text('تأكيد'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },

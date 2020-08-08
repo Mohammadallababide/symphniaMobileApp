@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:symphonia_mobile_app/scoped-models/main.dart';
 import '../consts.dart';
 import 'package:google_fonts_arabic/fonts.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'dart:async';
 
 class SingInPage extends StatefulWidget {
   @override
@@ -12,21 +15,16 @@ class _SingInPageState extends State<SingInPage> {
   final Map<String, dynamic> _formData = {
     'email': null,
     'password': null,
-    'checkedValue ':false,
+    'checkedValue ': false,
   };
   final TextEditingController _passwordTextController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String _emailValue;
-  String _passwordValue;
   bool checkedValue = false;
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: customPurpleColor,
       body: ListView(
-        children: <Widget>[
-          drawArtCurve(),
-          secondPart(context)
-        ],
+        children: <Widget>[drawArtCurve(), secondPart(context)],
       ),
     );
   }
@@ -79,33 +77,20 @@ class _SingInPageState extends State<SingInPage> {
           color: Colors.white,
         ),
         child: Stack(
-
           children: <Widget>[
-
             Padding(
-
               padding: const EdgeInsets.only(top: 14.0, left: 25),
-
               child: IconButton(
-
                 icon: Icon(
-
                   Icons.arrow_back_ios,
-
                   color: const Color(0XFFD69E2E),
-
                   size: 34.0,
-
                 ),
-
                 onPressed: () {
                   Navigator.pop(context);
                 },
-
               ),
-
             ),
-
             Padding(
               padding: const EdgeInsets.only(top: 20, left: 75),
               child: Text(
@@ -120,7 +105,6 @@ class _SingInPageState extends State<SingInPage> {
                 textAlign: TextAlign.left,
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.only(top: 70),
               child: Center(
@@ -144,19 +128,16 @@ class _SingInPageState extends State<SingInPage> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
-                            onTap: (){
-
-                            },
+                            onTap: () {},
                             child: Padding(
                               padding: const EdgeInsets.only(right: 7),
                               child: Text(
-                                  'نسيت كلمة المرور؟',
+                                'نسيت كلمة المرور؟',
                                 style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: customPurpleColor,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: customPurpleColor,
                                     decorationThickness: 2.0,
-                                    fontSize: 16.0
-                                ),
+                                    fontSize: 16.0),
                               ),
                             ),
                           ),
@@ -164,7 +145,7 @@ class _SingInPageState extends State<SingInPage> {
                         SizedBox(
                           height: 11.0,
                         ),
-                        singUpButton(context),
+                        singInButton(context),
                         SizedBox(
                           height: 11.0,
                         ),
@@ -179,10 +160,13 @@ class _SingInPageState extends State<SingInPage> {
       ),
     );
   }
+
   Widget _buildEmailTextField() {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: 'البريد الإلكتروني', filled: true, fillColor: Colors.white),
+          labelText: 'البريد الإلكتروني',
+          filled: true,
+          fillColor: Colors.white),
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty ||
@@ -192,11 +176,10 @@ class _SingInPageState extends State<SingInPage> {
         }
       },
       onSaved: (String value) {
-//        _formData['email'] = value;
+        _formData['email'] = value;
       },
     );
   }
-
 
   Widget _buildPasswordTextField() {
     return TextFormField(
@@ -210,38 +193,25 @@ class _SingInPageState extends State<SingInPage> {
         }
       },
       onSaved: (String value) {
-//        _formData['password'] = value;
-      },
-    );
-  }
-
-  Widget _buildPasswordConfirmTextField() {
-    return TextFormField(
-      decoration: InputDecoration(
-          labelText: 'تأكيد كلمة المرور', filled: true, fillColor: Colors.white),
-      obscureText: true,
-      validator: (String value) {
-        if (_passwordTextController.text != value) {
-          return 'كلمة المرور غير متطابقة';
-        }
+        _formData['password'] = value;
       },
     );
   }
 
   void _onRememberMeChanged(bool newValue) => setState(() {
-    checkedValue = newValue;
+        checkedValue = newValue;
+        if (checkedValue) {
+          // TODO: Here goes your functionality that remembers the user.
+        } else {
+          // TODO: Forget the user
+        }
+      });
 
-    if (checkedValue) {
-      // TODO: Here goes your functionality that remembers the user.
-    } else {
-      // TODO: Forget the user
-    }
-  });
-
-  Widget buildCheckBox(){
+  Widget buildCheckBox() {
     return CheckboxListTile(
       activeColor: customPurpleColor,
-      title: Align(alignment: Alignment.centerRight, child: Text("حفظ تسجيل الدخول")),
+      title: Align(
+          alignment: Alignment.centerRight, child: Text("حفظ تسجيل الدخول")),
       value: checkedValue,
       onChanged: _onRememberMeChanged,
       controlAffinity: ListTileControlAffinity.leading,
@@ -250,42 +220,68 @@ class _SingInPageState extends State<SingInPage> {
     );
   }
 
-  void _submitForm(){
+  void _submitForm(Function singIn) async {
     if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
-    Navigator.pushNamed(context, '/auth');
+    final Map<String, dynamic> successInformation =
+        await singIn(_formData['email'], _formData['password']);
+    if (successInformation['success']) {
+      Navigator.pushReplacementNamed(context, '/auth');
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('An Error Occurred!'),
+            content: Text(successInformation['message']),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
   }
 
-  Widget singUpButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/singin');
-      },
-      child: Container(
-        width: 300.0,
-        height: 55.0,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          color: const Color(0xff252427),
-        ),
-        child: Center(
-          child: Text(
-            'تسجيل الدخول',
-            style: TextStyle(
-              fontFamily: ArabicFonts.El_Messiri,
-              package: 'google_fonts_arabic',
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.left,
-          ),
-        ),
-      ),
-    );
+  Widget singInButton(BuildContext context) {
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget widget, MainModel model) {
+      return model.isLoading
+          ? CircularProgressIndicator()
+          : GestureDetector(
+              onTap: () {
+                _submitForm(model.singIn);
+                Navigator.pushNamed(context, '/singin');
+              },
+              child: Container(
+                width: 300.0,
+                height: 55.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  color: const Color(0xff252427),
+                ),
+                child: Center(
+                  child: Text(
+                    'تسجيل الدخول',
+                    style: TextStyle(
+                      fontFamily: ArabicFonts.El_Messiri,
+                      package: 'google_fonts_arabic',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+              ),
+            );
+    });
   }
-
 }
-
