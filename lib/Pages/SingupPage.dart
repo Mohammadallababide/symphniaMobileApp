@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:symphonia_mobile_app/scoped-models/main.dart';
 import '../consts.dart';
 import 'package:google_fonts_arabic/fonts.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class SingUpPage extends StatefulWidget {
   @override
@@ -9,23 +11,15 @@ class SingUpPage extends StatefulWidget {
 }
 
 class _SingUpPageState extends State<SingUpPage> {
-  final Map<String, dynamic> _formData = {
-    'email': null,
-    'password': null
-  };
+  final Map<String, dynamic> _formData = {'email': null, 'password': null};
   final TextEditingController _passwordTextController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String _emailValue;
-  String _passwordValue;
   @override
   Widget build(BuildContext context) {
-   return  Scaffold(
+    return Scaffold(
       backgroundColor: customPurpleColor,
       body: ListView(
-        children: <Widget>[
-          drawArtCurve(),
-          secondPart(context)
-        ],
+        children: <Widget>[drawArtCurve(), secondPart(context)],
       ),
     );
   }
@@ -78,33 +72,20 @@ class _SingUpPageState extends State<SingUpPage> {
           color: Colors.white,
         ),
         child: Stack(
-
           children: <Widget>[
-
             Padding(
-
               padding: const EdgeInsets.only(top: 14.0, left: 25),
-
               child: IconButton(
-
                 icon: Icon(
-
                   Icons.arrow_back_ios,
-
                   color: const Color(0XFFD69E2E),
-
                   size: 34.0,
-
                 ),
-
                 onPressed: () {
                   Navigator.pop(context);
                 },
-
               ),
-
             ),
-
             Padding(
               padding: const EdgeInsets.only(top: 20, left: 75),
               child: Text(
@@ -119,7 +100,6 @@ class _SingUpPageState extends State<SingUpPage> {
                 textAlign: TextAlign.left,
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.only(top: 70),
               child: Center(
@@ -155,10 +135,13 @@ class _SingUpPageState extends State<SingUpPage> {
       ),
     );
   }
+
   Widget _buildEmailTextField() {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: 'البريد الإلكتروني', filled: true, fillColor: Colors.white),
+          labelText: 'البريد الإلكتروني',
+          filled: true,
+          fillColor: Colors.white),
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty ||
@@ -168,11 +151,10 @@ class _SingUpPageState extends State<SingUpPage> {
         }
       },
       onSaved: (String value) {
-//        _formData['email'] = value;
+        _formData['email'] = value;
       },
     );
   }
-
 
   Widget _buildPasswordTextField() {
     return TextFormField(
@@ -186,7 +168,7 @@ class _SingUpPageState extends State<SingUpPage> {
         }
       },
       onSaved: (String value) {
-//        _formData['password'] = value;
+        _formData['password'] = value;
       },
     );
   }
@@ -194,7 +176,9 @@ class _SingUpPageState extends State<SingUpPage> {
   Widget _buildPasswordConfirmTextField() {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: 'تأكيد كلمة المرور', filled: true, fillColor: Colors.white),
+          labelText: 'تأكيد كلمة المرور',
+          filled: true,
+          fillColor: Colors.white),
       obscureText: true,
       validator: (String value) {
         if (_passwordTextController.text != value) {
@@ -204,48 +188,71 @@ class _SingUpPageState extends State<SingUpPage> {
     );
   }
 
-  void _submitForm(){
+  void _submitForm(Function singUp) async {
     if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
-    Navigator.pushNamed(context, '/auth');
+    final Map<String, dynamic> successInformation =
+        await singUp(_formData['email'], _formData['password']);
+    if (successInformation['success']) {
+      Navigator.pushReplacementNamed(context, '/auth');
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('An Error Occurred!'),
+            content: Text(successInformation['message']),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
   }
 
   Widget singUpButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-//        Navigator.pushNamed(context, '/singup');
-        _submitForm();
-      },
-      child: Container(
-        width: 300.0,
-        height: 55.0,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(
-            width: 3.0,
-            color: const Color(0xff252427),
-          ),
-          color: Colors.white,
-        ),
-        child: Center(
-          child: Text(
-            'إنشاء حساب',
-            style: TextStyle(
-              fontFamily: ArabicFonts.El_Messiri,
-              package: 'google_fonts_arabic',
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Colors.black,
-            ),
-            textAlign: TextAlign.left,
-          ),
-        ),
-      ),
-
-    );
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget widget, MainModel model) {
+      return model.isLoading
+          ? CircularProgressIndicator()
+          : GestureDetector(
+              onTap: () {
+                _submitForm(model.singUp);
+              },
+              child: Container(
+                width: 300.0,
+                height: 55.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(
+                    width: 3.0,
+                    color: const Color(0xff252427),
+                  ),
+                  color: Colors.white,
+                ),
+                child: Center(
+                  child: Text(
+                    'إنشاء حساب',
+                    style: TextStyle(
+                      fontFamily: ArabicFonts.El_Messiri,
+                      package: 'google_fonts_arabic',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+              ),
+            );
+    });
   }
-
 }
-
