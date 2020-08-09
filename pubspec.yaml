@@ -26,6 +26,7 @@ dependencies:
   google_fonts_arabic: ^1.1.7
   scoped_model: ^1.0.1
   http: ^0.12.2
+  shared_preferences: ^0.5.8
 
 
 dev_dependencies:

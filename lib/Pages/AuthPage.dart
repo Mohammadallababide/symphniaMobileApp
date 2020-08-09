@@ -18,13 +18,10 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: customPurpleColor,
       body: ListView(
-        children: <Widget>[
-          drawArtCurve(),
-          secondPart(context)
-        ],
+        children: <Widget>[drawArtCurve(), secondPart(context)],
       ),
     );
   }
@@ -77,31 +74,19 @@ class _AuthPageState extends State<AuthPage> {
           color: Colors.white,
         ),
         child: Stack(
-
           children: <Widget>[
-
             Padding(
-
               padding: const EdgeInsets.only(top: 14.0, left: 25),
-
               child: IconButton(
-
                 icon: Icon(
-
                   Icons.arrow_back_ios,
-
                   color: const Color(0XFFD69E2E),
-
                   size: 34.0,
-
                 ),
-
                 onPressed: () {
                   Navigator.pop(context);
                 },
-
               ),
-
             ),
 
             Padding(
@@ -149,7 +134,9 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                       child: TextField(
                         decoration: InputDecoration(
-                            labelText: 'شيفرة التفعيل', filled: true, fillColor: Colors.white),
+                            labelText: 'شيفرة التفعيل',
+                            filled: true,
+                            fillColor: Colors.white),
                       ),
                     ),
                   ),
@@ -160,7 +147,7 @@ class _AuthPageState extends State<AuthPage> {
                     padding: const EdgeInsets.only(top: 10),
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/singin');
+                        Navigator.pushNamed(context, '/home');
                       },
                       child: Container(
                         width: 300.0,
@@ -189,7 +176,7 @@ class _AuthPageState extends State<AuthPage> {
                     height: 15.0,
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10,right: 7.0),
+                    padding: const EdgeInsets.only(top: 10, right: 7.0),
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
@@ -212,9 +199,8 @@ class _AuthPageState extends State<AuthPage> {
                     padding: const EdgeInsets.only(left: 7.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                       child: GestureDetector(
-                        onTap: () {
-                        },
+                      child: GestureDetector(
+                        onTap: () {},
                         child: Container(
                           width: 220.0,
                           height: 45.0,
@@ -236,15 +222,14 @@ class _AuthPageState extends State<AuthPage> {
                             ),
                           ),
                         ),
+                      ),
                     ),
-                     ),
                   ),
                   SizedBox(
                     height: 10.0,
                   ),
                 ],
               ),
-
             ),
 
 //            Padding(
@@ -270,10 +255,13 @@ class _AuthPageState extends State<AuthPage> {
       ),
     );
   }
+
   Widget _buildEmailTextField() {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: 'البريد الإلكتروني', filled: true, fillColor: Colors.white),
+          labelText: 'البريد الإلكتروني',
+          filled: true,
+          fillColor: Colors.white),
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty ||
@@ -288,8 +276,7 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-
-  void _submitForm(){
+  void _submitForm() {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
@@ -327,10 +314,6 @@ class _AuthPageState extends State<AuthPage> {
           ),
         ),
       ),
-
     );
   }
-
 }
-
-

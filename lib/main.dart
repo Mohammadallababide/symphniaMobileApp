@@ -6,14 +6,27 @@ import './Pages/SingupPage.dart';
 import 'Pages/AuthPage.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import 'Pages/HomePage.dart';
+
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
+  @override
+  _State createState() => _State();
+}
+
+class _State extends State<MyApp> {
+  final MainModel _model = MainModel();
+  @override
+  void initState() {
+    _model.autoAuthenticate();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModel(
-      model: MainModel(),
+      model: _model,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
@@ -21,10 +34,15 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         routes: {
-          '/': (BuildContext context) => IntroPage(),
+          '/': (BuildContext context) => ScopedModelDescendant<MainModel>(
+                  builder:
+                      (BuildContext context, Widget widget, MainModel model) {
+                return model.account == null ? IntroPage() : HomePage();
+              }),
           '/singin': (BuildContext context) => SingInPage(),
           '/singup': (BuildContext context) => SingUpPage(),
-          '/auth': (BuildContext context) => AuthPage()
+          '/auth': (BuildContext context) => AuthPage(),
+          '/home': (BuildContext context) => HomePage(),
         },
         onGenerateRoute: (RouteSettings settings) {},
         onUnknownRoute: (RouteSettings settings) {},

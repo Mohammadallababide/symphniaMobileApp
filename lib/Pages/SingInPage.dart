@@ -4,7 +4,6 @@ import 'package:symphonia_mobile_app/scoped-models/main.dart';
 import '../consts.dart';
 import 'package:google_fonts_arabic/fonts.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'dart:async';
 
 class SingInPage extends StatefulWidget {
   @override
@@ -15,11 +14,10 @@ class _SingInPageState extends State<SingInPage> {
   final Map<String, dynamic> _formData = {
     'email': null,
     'password': null,
-    'checkedValue ': false,
+    'checkedValue': false,
   };
   final TextEditingController _passwordTextController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool checkedValue = false;
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: customPurpleColor,
@@ -199,12 +197,7 @@ class _SingInPageState extends State<SingInPage> {
   }
 
   void _onRememberMeChanged(bool newValue) => setState(() {
-        checkedValue = newValue;
-        if (checkedValue) {
-          // TODO: Here goes your functionality that remembers the user.
-        } else {
-          // TODO: Forget the user
-        }
+        _formData['checkedValue'] = newValue;
       });
 
   Widget buildCheckBox() {
@@ -212,7 +205,7 @@ class _SingInPageState extends State<SingInPage> {
       activeColor: customPurpleColor,
       title: Align(
           alignment: Alignment.centerRight, child: Text("حفظ تسجيل الدخول")),
-      value: checkedValue,
+      value: _formData['checkedValue'],
       onChanged: _onRememberMeChanged,
       controlAffinity: ListTileControlAffinity.leading,
       checkColor: Colors.white,
@@ -225,20 +218,20 @@ class _SingInPageState extends State<SingInPage> {
       return;
     }
     _formKey.currentState.save();
-    final Map<String, dynamic> successInformation =
-        await singIn(_formData['email'], _formData['password']);
+    final Map<String, dynamic> successInformation = await singIn(
+        _formData['email'], _formData['password'], _formData['checkedValue']);
     if (successInformation['success']) {
-      Navigator.pushReplacementNamed(context, '/auth');
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('An Error Occurred!'),
+            title: Text('فشل تسجيل الدخول!'),
             content: Text(successInformation['message']),
             actions: <Widget>[
               FlatButton(
-                child: Text('Okay'),
+                child: Text('تأكيد'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -258,7 +251,6 @@ class _SingInPageState extends State<SingInPage> {
           : GestureDetector(
               onTap: () {
                 _submitForm(model.singIn);
-                Navigator.pushNamed(context, '/singin');
               },
               child: Container(
                 width: 300.0,
