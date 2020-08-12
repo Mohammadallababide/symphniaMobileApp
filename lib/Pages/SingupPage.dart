@@ -196,7 +196,7 @@ class _SingUpPageState extends State<SingUpPage> {
     final Map<String, dynamic> successInformation =
         await singUp(_formData['email'], _formData['password']);
     if (successInformation['success']) {
-      Navigator.pushReplacementNamed(context, '/auth');
+      Navigator.pushNamed(context, '/auth');
     } else {
       showDialog(
         context: context,

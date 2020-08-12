@@ -6,7 +6,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
-          Text('الصفحة الرئيسية'),
+          Center(child: Text('الصفحة الرئيسية')),
         ],
       ),
       body: Container(),

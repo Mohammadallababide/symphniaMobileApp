@@ -25,37 +25,43 @@ mixin AccountModel on ConectedAppModel {
       'password': password,
       'returnSecureToken': true,
     };
-    final http.Response response = await http.post(
-      'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=$apiKey',
-      body: json.encode(authData),
-      headers: {'Content-Type': 'application/json'},
-    );
-    final Map<String, dynamic> responseData = json.decode(response.body);
     bool hasError = true;
     String message = 'يوجد خطاء في الأتصال تحقق من اتصالك بلشبكة الانترنت.';
-    if (responseData.containsKey('idToken')) {
-      hasError = false;
-      message = 'Authentication succeeded!';
-      _useraccount = new Account();
-      _useraccount.setAccountEmail(email);
-      _useraccount.setAccountPassword(password);
-      _useraccount.setId(responseData['localId']);
-      _useraccount.setToken(responseData['idToken']);
-      // لحفظ معلومات تسجيل الدخول إذا أراد المستخدم حفظها من اجل تسجيل دخول تلقائي على نفس الجهاز
-      if (issaved) {
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('token', _useraccount.getToken());
-        prefs.setString('email', _useraccount.getAccountEmail());
-        prefs.setString('password', _useraccount.getAccountPassword());
-        prefs.setString('id', _useraccount.getId());
+    try {
+      final http.Response response = await http.post(
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=$apiKey',
+        body: json.encode(authData),
+        headers: {'Content-Type': 'application/json'},
+      );
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      if (responseData.containsKey('idToken')) {
+        hasError = false;
+        message = 'Authentication succeeded!';
+        _useraccount = new Account();
+        _useraccount.setAccountEmail(email);
+        _useraccount.setAccountPassword(password);
+        _useraccount.setId(responseData['localId']);
+        _useraccount.setToken(responseData['idToken']);
+        // لحفظ معلومات تسجيل الدخول إذا أراد المستخدم حفظها من اجل تسجيل دخول تلقائي على نفس الجهاز
+        if (issaved) {
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('token', _useraccount.getToken());
+          prefs.setString('email', _useraccount.getAccountEmail());
+          prefs.setString('password', _useraccount.getAccountPassword());
+          prefs.setString('id', _useraccount.getId());
+        }
+      } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND' ||
+          responseData['error']['message'] == 'NVALID_PASSWORD') {
+        message = 'البريد الإلكتروني أو كلمة المرور غير صحيحة .';
       }
-    } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND' ||
-        responseData['error']['message'] == 'NVALID_PASSWORD') {
-      message = 'البريد الإلكتروني أو كلمة المرور غير صحيحة .';
+      _isLoading = false;
+      notifyListeners();
+      return {'success': !hasError, 'message': message};
+    } catch (error) {
+      _isLoading = false;
+      notifyListeners();
+      return {'success': !hasError, 'message': message};
     }
-    _isLoading = false;
-    notifyListeners();
-    return {'success': !hasError, 'message': message};
   }
 
   void autoAuthenticate() async {
@@ -70,6 +76,7 @@ mixin AccountModel on ConectedAppModel {
       _useraccount.setAccountPassword(password);
       _useraccount.setId(id);
       _useraccount.setToken(token);
+      notifyListeners();
     }
   }
 

@@ -147,7 +147,8 @@ class _AuthPageState extends State<AuthPage> {
                     padding: const EdgeInsets.only(top: 10),
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/home');
+                        Navigator.pushReplacementNamed(
+                            context, '/cr_generalInfo');
                       },
                       child: Container(
                         width: 300.0,

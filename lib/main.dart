@@ -6,6 +6,7 @@ import './Pages/SingupPage.dart';
 import 'Pages/AuthPage.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import 'Pages/CreategeneralInfoPage.dart';
 import 'Pages/HomePage.dart';
 
 void main() => runApp(MyApp());
@@ -34,15 +35,17 @@ class _State extends State<MyApp> {
           primarySwatch: Colors.blue,
         ),
         routes: {
-          '/': (BuildContext context) => ScopedModelDescendant<MainModel>(
-                  builder:
-                      (BuildContext context, Widget widget, MainModel model) {
-                return model.account == null ? IntroPage() : HomePage();
-              }),
-          '/singin': (BuildContext context) => SingInPage(),
-          '/singup': (BuildContext context) => SingUpPage(),
-          '/auth': (BuildContext context) => AuthPage(),
-          '/home': (BuildContext context) => HomePage(),
+          // '/': (BuildContext context) => ScopedModelDescendant<MainModel>(
+          //         builder:
+          //             (BuildContext context, Widget widget, MainModel model) {
+          //       return model.account == null ? IntroPage() : HomePage();
+          //     }),
+          // '/singin': (BuildContext context) => SingInPage(),
+          // '/singup': (BuildContext context) => SingUpPage(),
+          // '/auth': (BuildContext context) => AuthPage(),
+          // '/home': (BuildContext context) => HomePage(),
+          '/': (BuildContext context) => CreateGeneralInfoPage(),
+          // cr_generalInfo
         },
         onGenerateRoute: (RouteSettings settings) {},
         onUnknownRoute: (RouteSettings settings) {},
