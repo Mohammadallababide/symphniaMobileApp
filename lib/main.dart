@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:symphonia_mobile_app/Pages/CreateEdeuctionInfo.dart';
 import 'package:symphonia_mobile_app/Pages/IntroPage.dart';
 import 'package:symphonia_mobile_app/Pages/SingInPage.dart';
 import 'package:symphonia_mobile_app/scoped-models/main.dart';
@@ -35,17 +36,19 @@ class _State extends State<MyApp> {
           primarySwatch: Colors.blue,
         ),
         routes: {
-          // '/': (BuildContext context) => ScopedModelDescendant<MainModel>(
-          //         builder:
-          //             (BuildContext context, Widget widget, MainModel model) {
-          //       return model.account == null ? IntroPage() : HomePage();
-          //     }),
-          // '/singin': (BuildContext context) => SingInPage(),
-          // '/singup': (BuildContext context) => SingUpPage(),
-          // '/auth': (BuildContext context) => AuthPage(),
-          // '/home': (BuildContext context) => HomePage(),
-          '/': (BuildContext context) => CreateGeneralInfoPage(),
+          '/': (BuildContext context) => ScopedModelDescendant<MainModel>(
+                  builder:
+                      (BuildContext context, Widget widget, MainModel model) {
+                return model.account == null ? IntroPage() : HomePage();
+              }),
+          '/singin': (BuildContext context) => SingInPage(),
+          '/singup': (BuildContext context) => SingUpPage(),
+          '/auth': (BuildContext context) => AuthPage(),
+          '/home': (BuildContext context) => HomePage(),
+          '/cr_generalInfo': (BuildContext context) => CreateGeneralInfoPage(),
           // cr_generalInfo
+          '/cr_eduectionInfo': (BuildContext context) =>
+              CreateEdeuctionInfoPage(),
         },
         onGenerateRoute: (RouteSettings settings) {},
         onUnknownRoute: (RouteSettings settings) {},

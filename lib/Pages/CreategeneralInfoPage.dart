@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../consts.dart';
 import 'package:google_fonts_arabic/fonts.dart';
+import 'dart:async';
 
 class CreateGeneralInfoPage extends StatefulWidget {
   @override
@@ -13,6 +17,7 @@ class _CreateGeneralInfoPageState extends State<CreateGeneralInfoPage> {
   String _selectNationalityValue;
   String _selectGenederValue;
   DateTime selectedDate;
+  File imageProfile;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,9 +111,7 @@ class _CreateGeneralInfoPageState extends State<CreateGeneralInfoPage> {
                       color: Colors.white,
                       size: 100.0,
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed: () {},
                   ),
                 ),
               ),
@@ -117,10 +120,13 @@ class _CreateGeneralInfoPageState extends State<CreateGeneralInfoPage> {
               alignment: Alignment.centerRight,
               child: Padding(
                 padding: EdgeInsets.only(top: 240, right: 100),
-                child: Icon(
-                  Icons.mode_edit,
-                  size: 30.0,
+                child: IconButton(
+                  iconSize: 30.0,
                   color: const Color(0xff4E5154),
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    showChoiceDialog();
+                  },
                 ),
               ),
             ),
@@ -134,23 +140,27 @@ class _CreateGeneralInfoPageState extends State<CreateGeneralInfoPage> {
                     Container(
                       height: 60,
                       width: 320,
-                      child: TextField(
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              width: 0.80,
-                              color: const Color(0xff252427),
-                              style: BorderStyle.solid,
+                      child: TextFormField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                width: 0.80,
+                                color: const Color(0xff252427),
+                                style: BorderStyle.solid,
+                              ),
                             ),
+                            labelText: 'الاسم الكامل',
+                            hintStyle: new TextStyle(color: Colors.grey[800]),
+                            // contentPadding: EdgeInsets.all(18),
                           ),
-                          labelText: 'الاسم الكامل',
-                          hintStyle: new TextStyle(color: Colors.grey[800]),
-                          // contentPadding: EdgeInsets.all(18),
-                        ),
-                      ),
+                          validator: (String value) {
+                            if (value.isEmpty){
+                                return 'الاسم مطلوب';
+                            }
+                          }),
                     ),
                     SizedBox(
                       height: 16,
@@ -442,7 +452,7 @@ class _CreateGeneralInfoPageState extends State<CreateGeneralInfoPage> {
     return GestureDetector(
       onTap: () {
         // todo navigate to eduction info page
-        // Navigator.pushNamed(context, '/singin');
+        Navigator.pushNamed(context, '/cr_eduectionInfo');
       },
       child: Container(
         height: 60,
@@ -466,5 +476,58 @@ class _CreateGeneralInfoPageState extends State<CreateGeneralInfoPage> {
         ),
       ),
     );
+  }
+
+  Future<void> showChoiceDialog() {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('اختيار صورة الملف الشخصي'),
+            content: SingleChildScrollView(
+                child: ListBody(
+              children: [
+                ListTile(
+                  title: Text('إلتقاط صورة'),
+                  leading: Icon(
+                    Icons.camera_alt,
+                    color: customPurpleColor,
+                  ),
+                  onTap: () {
+                    openCamera();
+                  },
+                ),
+                ListTile(
+                  title: Text('صورة من المعرض'),
+                  leading: Icon(
+                    Icons.photo_library,
+                    color: customPurpleColor,
+                  ),
+                  onTap: () {
+                    openGallary();
+                  },
+                ),
+              ],
+            )),
+          );
+        });
+  }
+
+  openGallary() async {
+    // ignore: deprecated_member_use
+    var picture = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      imageProfile = picture;
+    });
+    Navigator.of(context).pop();
+  }
+
+  openCamera() async {
+    // ignore: deprecated_member_use
+    var picture = await ImagePicker.pickImage(source: ImageSource.camera);
+    setState(() {
+      imageProfile = picture;
+    });
+    Navigator.of(context).pop();
   }
 }

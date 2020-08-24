@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:symphonia_mobile_app/scoped-models/main.dart';
 import '../consts.dart';
 import 'package:google_fonts_arabic/fonts.dart';
 
@@ -12,10 +14,7 @@ class _AuthPageState extends State<AuthPage> {
   final Map<String, dynamic> _formData = {
     'ActivateCode': null,
   };
-  final TextEditingController _passwordTextController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String _acticatedCode;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,11 +131,26 @@ class _AuthPageState extends State<AuthPage> {
                           color: const Color(0xffAC50FC),
                         ),
                       ),
-                      child: TextField(
-                        decoration: InputDecoration(
+                      child: Form(
+                        key: _formKey,
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
                             labelText: 'شيفرة التفعيل',
                             filled: true,
-                            fillColor: Colors.white),
+                            fillColor: Colors.white,
+                          ),
+                          validator: (String value) {
+                            if (value.length < 6 || value.length > 6) {
+                              return 'يجب ان تكون شيفرة التفعيل مكونة من 6 محارف';
+                            } else if (value.isEmpty) {
+                              return 'يجب ملأ هذا الحقل';
+                            }
+                          },
+                          onSaved: (String value) {
+                            _formData['ActivateCode'] = value;
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -145,33 +159,37 @@ class _AuthPageState extends State<AuthPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacementNamed(
-                            context, '/cr_generalInfo');
-                      },
-                      child: Container(
-                        width: 300.0,
-                        height: 55.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          color: const Color(0xff252427),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'تأكيد شيفرة التفعيل',
-                            style: TextStyle(
-                              fontFamily: ArabicFonts.El_Messiri,
-                              package: 'google_fonts_arabic',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.white,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                      ),
-                    ),
+                    child: ScopedModelDescendant<MainModel>(builder:
+                        (BuildContext context, Widget child, MainModel model) {
+                      return model.isLoading
+                          ? CircularProgressIndicator()
+                          : GestureDetector(
+                              onTap: () {
+                                _submitForm(model.sendActivation);
+                              },
+                              child: Container(
+                                width: 300.0,
+                                height: 55.0,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  color: const Color(0xff252427),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'تأكيد شيفرة التفعيل',
+                                    style: TextStyle(
+                                      fontFamily: ArabicFonts.El_Messiri,
+                                      package: 'google_fonts_arabic',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                              ),
+                            );
+                    }),
                   ),
                   SizedBox(
                     height: 15.0,
@@ -233,88 +251,42 @@ class _AuthPageState extends State<AuthPage> {
               ),
             ),
 
-//            Padding(
-//              padding: const EdgeInsets.only(top: 110),
-//              child: Center(
-//                child: SingleChildScrollView(
-//                  child: Form(
-//                    key: _formKey,
-//                    child: Column(
-//                      children: <Widget>[
-//                        _buildEmailTextField(),
-//                        SizedBox(
-//                          height: 10.0,
-//                        ),
-//                      ],
-//                    ),
-//                  ),
-//                ),
-//              ),
-//            )
+//
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEmailTextField() {
-    return TextFormField(
-      decoration: InputDecoration(
-          labelText: 'البريد الإلكتروني',
-          filled: true,
-          fillColor: Colors.white),
-      keyboardType: TextInputType.emailAddress,
-      validator: (String value) {
-        if (value.isEmpty ||
-            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                .hasMatch(value)) {
-          return 'البريد الأكتروني غير صالح';
-        }
-      },
-      onSaved: (String value) {
-//        _formData['email'] = value;
-      },
-    );
-  }
-
-  void _submitForm() {
-    if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
+  void _submitForm(Function sendAcctivation) async {
+    if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
-  }
-
-  Widget singUpButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-//        Navigator.pushNamed(context, '/singup');
-        _submitForm();
-      },
-      child: Container(
-        width: 300.0,
-        height: 55.0,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(
-            width: 3.0,
-            color: const Color(0xff252427),
-          ),
-          color: Colors.black,
-        ),
-        child: Center(
-          child: Text(
-            'إنشاء حساب',
-            style: TextStyle(
-              fontFamily: ArabicFonts.El_Messiri,
-              package: 'google_fonts_arabic',
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Colors.black,
+    final bool resultAcctivation =
+        await sendAcctivation(_formData['ActivateCode']);
+    if (resultAcctivation) {
+      Navigator.pushReplacementNamed(context, '/cr_generalInfo');
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('!خطاء ما قد حصل'),
+            content: Text(
+              'كود التفعيل غير صحيح أو ان الأنصال بلأنترنت غير متوفر',
             ),
-            textAlign: TextAlign.left,
-          ),
-        ),
-      ),
-    );
+            actions: <Widget>[
+              FlatButton(
+                child: Text('تأكيد'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
   }
 }

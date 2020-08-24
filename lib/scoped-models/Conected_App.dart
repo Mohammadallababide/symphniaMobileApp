@@ -15,7 +15,150 @@ mixin AccountModel on ConectedAppModel {
     return _useraccount;
   }
 
-  static const String apiKey = 'AIzaSyBO_UnlGGsyIQbZyo0Z8xkeMHXopfts5Mo';
+  static const String apiKey = 'http://192.168.1.8:8000/api';
+
+  Future<bool> sendActivation(String code) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> acctivationCode = {
+      'two_factor_code': code,
+    };
+    try {
+      final http.Response response = await http.post(
+        apiKey + '/details',
+        body: json.encode(acctivationCode),
+        headers: {
+          'Accept': 'application/json',
+          'Content-type': 'application/json',
+          'Authorization': 'Bearer ' + _useraccount.getToken(),
+        },
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+      final Map<String, dynamic> accitvationResponse =
+          json.decode(response.body);
+      print(
+          '*************************************************************************');
+      print(accitvationResponse);
+      print(
+          '*************************************************************************');
+      if (response.body.contains('success')) {
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (error) {
+      // print(
+      //     '*************************************************************************');
+      // print('///Catch Error///');
+      // print(
+      //     '*************************************************************************');
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>> singUp(String email, String password) async {
+    bool hasError = true;
+    String message = ' ';
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> authData = {
+      'email': email,
+      'password': password,
+    };
+    try {
+      final http.Response response = await http.post(
+        apiKey + '/register',
+        body: json.encode(authData),
+        headers: {
+          'Accept': 'application/json',
+          'Content-type': 'application/json'
+        },
+      );
+      print(
+          "*********************************************************************************************");
+      print(response.statusCode);
+      print(
+          "*********************************************************************************************");
+      if (response.statusCode == 404) {
+        message = 'خطاء بلأتصال بشبكة الأنترنت';
+        hasError = true;
+        _isLoading = false;
+        notifyListeners();
+        return {'success': !hasError, 'message': message};
+      }
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      print(
+          "*********************************************************************************************");
+      print(responseData);
+      print(
+          "*********************************************************************************************");
+
+      if (response.body.contains('error')) {
+        hasError = true;
+        print('data : ${responseData['error']}');
+        message = 'إن هذا البريد الأكتروني مسجل مسبقا';
+        // responseData['error']['email']
+      } else {
+        hasError = false;
+        print('data : ${responseData['success']['token']}');
+        _useraccount = new Account();
+        _useraccount.setAccountEmail(email);
+        _useraccount.setAccountPassword(password);
+        _useraccount.setToken(responseData['success']['token']);
+      }
+      _isLoading = false;
+      notifyListeners();
+      return {'success': !hasError, 'message': message};
+    } catch (error) {
+      _isLoading = false;
+      message = 'يوجد خطاء بلأتصال الأنترنت';
+      notifyListeners();
+      return {'success': !hasError, 'message': message};
+    }
+    // if (responseData.containsKey('remember_token')) {
+    //   hasError = false;
+    //   message = 'Authentication succeeded!';
+    //   _useraccount = Account();
+    //   _useraccount.setAccountEmail(email);
+    //   _useraccount.setAccountPassword(password);
+    //   _useraccount.setId(responseData['id']);
+    //   _useraccount.setToken(responseData['remember_token']);
+    //   //  لحفظ معلومات إنشاء الحساب على الجهاز من اجل تسجيل دخول تلقائي على هذا الحساب المنشء من نفس الجهاز
+    //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //   prefs.setString('token', _useraccount.getToken());
+    //   prefs.setString('email', _useraccount.getAccountEmail());
+    //   prefs.setString('password', _useraccount.getAccountPassword());
+    //   prefs.setString('id', _useraccount.getId());
+    // } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
+    //   message = 'البريد الإلكتروني المدخل موجود مسبقا.';
+    // }
+  }
+
+  void autoAuthenticate() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String token = prefs.getString('token');
+    if (token != null) {
+      final String email = prefs.getString('email');
+      final String password = prefs.getString('password');
+      final String id = prefs.getString('id');
+      _useraccount.setAccountEmail(email);
+      _useraccount.setAccountPassword(password);
+      _useraccount.setId(id);
+      _useraccount.setToken(token);
+      notifyListeners();
+    }
+  }
+
   Future<Map<String, dynamic>> singIn(
       String email, String password, bool issaved) async {
     _isLoading = true;
@@ -62,60 +205,6 @@ mixin AccountModel on ConectedAppModel {
       notifyListeners();
       return {'success': !hasError, 'message': message};
     }
-  }
-
-  void autoAuthenticate() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String token = prefs.getString('token');
-    if (token != null) {
-      final String email = prefs.getString('email');
-      final String password = prefs.getString('password');
-      final String id = prefs.getString('id');
-      _useraccount = new Account();
-      _useraccount.setAccountEmail(email);
-      _useraccount.setAccountPassword(password);
-      _useraccount.setId(id);
-      _useraccount.setToken(token);
-      notifyListeners();
-    }
-  }
-
-  Future<Map<String, dynamic>> singUp(String email, String password) async {
-    _isLoading = true;
-    notifyListeners();
-    final Map<String, dynamic> authData = {
-      'email': email,
-      'password': password,
-      'returnSecureToken': true,
-    };
-    final http.Response response = await http.post(
-      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey',
-      body: json.encode(authData),
-      headers: {'Content-Type': 'application/json'},
-    );
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    bool hasError = true;
-    String message = 'تحقق من الأتصال بلأنترنت.';
-    if (responseData.containsKey('idToken')) {
-      hasError = false;
-      message = 'Authentication succeeded!';
-      _useraccount = Account();
-      _useraccount.setAccountEmail(email);
-      _useraccount.setAccountPassword(password);
-      _useraccount.setId(responseData['localId']);
-      _useraccount.setToken(responseData['idToken']);
-      //  لحفظ معلومات إنشاء الحساب على الجهاز من اجل تسجيل دخول تلقائي على هذا الحساب المنشء من نفس الجهاز
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('token', _useraccount.getToken());
-      prefs.setString('email', _useraccount.getAccountEmail());
-      prefs.setString('password', _useraccount.getAccountPassword());
-      prefs.setString('id', _useraccount.getId());
-    } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
-      message = 'البريد الإلكتروني المدخل موجود مسبقا.';
-    }
-    _isLoading = false;
-    notifyListeners();
-    return {'success': !hasError, 'message': message};
   }
 }
 
