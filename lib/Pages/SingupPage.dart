@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:symphonia_mobile_app/scoped-models/main.dart';
 import '../consts.dart';
 import 'package:google_fonts_arabic/fonts.dart';
@@ -24,46 +23,15 @@ class _SingUpPageState extends State<SingUpPage> {
     );
   }
 
-  Widget drawArtCurve() {
-    return Container(
-      height: 270.0,
-      color: customPurpleColor,
-      child: Stack(
-        children: <Widget>[
-          Center(
-            child: Transform.translate(
-              offset: Offset(10, -23),
-              child: SvgPicture.string(
-                svg_curve,
-                allowDrawingOutsideViewBox: true,
-              ),
-            ),
-          ),
-          Transform.translate(
-            offset: Offset(0, -2),
-            child: Center(
-              child: Text(
-                app_name,
-                style: TextStyle(
-                  fontFamily: ArabicFonts.El_Messiri,
-                  package: 'google_fonts_arabic',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 35,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-          ),
-        ],
-      ),
+ Widget drawArtCurve() {
+   return Image(
+      image: AssetImage('assets/images/IntroTagPage.jpg'),
     );
-  }
+}
 
   Widget secondPart(BuildContext context) {
-    return Transform.translate(
-      offset: Offset(0, 0),
-      child: Container(
+    return 
+      Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(30.0),
@@ -131,8 +99,7 @@ class _SingUpPageState extends State<SingUpPage> {
               ),
             )
           ],
-        ),
-      ),
+        ),   
     );
   }
 

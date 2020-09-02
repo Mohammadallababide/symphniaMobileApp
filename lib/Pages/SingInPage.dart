@@ -28,40 +28,10 @@ class _SingInPageState extends State<SingInPage> {
   }
 
   Widget drawArtCurve() {
-    return Container(
-      height: 270.0,
-      color: customPurpleColor,
-      child: Stack(
-        children: <Widget>[
-          Center(
-            child: Transform.translate(
-              offset: Offset(10, -23),
-              child: SvgPicture.string(
-                svg_curve,
-                allowDrawingOutsideViewBox: true,
-              ),
-            ),
-          ),
-          Transform.translate(
-            offset: Offset(0, -2),
-            child: Center(
-              child: Text(
-                app_name,
-                style: TextStyle(
-                  fontFamily: ArabicFonts.El_Messiri,
-                  package: 'google_fonts_arabic',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 35,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-          ),
-        ],
-      ),
+   return Image(
+      image: AssetImage('assets/images/IntroTagPage.jpg'),
     );
-  }
+}
 
   Widget secondPart(BuildContext context) {
     return Transform.translate(
